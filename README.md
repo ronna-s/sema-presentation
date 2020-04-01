@@ -144,6 +144,7 @@ for i := 0; i < maxHandlers; i++ {
 	for _, r := range reqs {
 		ch <- r
 	}
+    }()
 ```
 
 ```bash

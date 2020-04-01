@@ -18,15 +18,15 @@ func handle(r request) {
 	time.Sleep(time.Microsecond)
 }
 
-func process(nGoroutines int, reqs []request) {
+func process(maxHandlers int, reqs []request) {
 	var wg sync.WaitGroup
-	sem := semaphore.NewWeighted(int64(nGoroutines))
+	sem := semaphore.NewWeighted(int64(maxHandlers))
 
 	for _, r := range reqs {
 		wg.Add(1)
-		go func(m request) {
+		go func(r request) {
 			sem.Acquire(context.Background(), 1)
-			handle(m)
+			handle(r)
 			sem.Release(1)
 			wg.Done()
 		}(r)

@@ -16,13 +16,13 @@ func handle(r request) {
 	time.Sleep(time.Microsecond * 100)
 }
 
-func process(nGoroutines int, reqs []request) {
+func process(maxHandlers int, reqs []request) {
 	var wg sync.WaitGroup
-	wg.Add(nGoroutines)
+	wg.Add(maxHandlers)
 
-	ch := make(chan request, 10*nGoroutines) //a good number to toy with
+	ch := make(chan request, 10*maxHandlers) //a good number to toy with
 
-	for i := 0; i < nGoroutines; i++ {
+	for i := 0; i < maxHandlers; i++ {
 		go func() {
 			for r := range ch {
 				handle(r)

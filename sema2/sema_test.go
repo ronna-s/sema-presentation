@@ -16,9 +16,9 @@ func handle(r request) {
 	time.Sleep(time.Microsecond)
 }
 
-func process(nGoroutines int, reqs []request) {
+func process(maxHandlers int, reqs []request) {
 	var wg sync.WaitGroup
-	sema := make(chan struct{}, nGoroutines)
+	sema := make(chan struct{}, maxHandlers)
 	for _, r := range reqs {
 		wg.Add(1)
 		sema <- struct{}{}

@@ -27,7 +27,7 @@ go func(r request) {
 
 ```bash
 go test github.com/ronna-s/sema-presentation/sema1 -bench=. -benchtime=1000000x
-#-benchtime Nx (suffix x) means run N times, we test multiple number of workers
+#-benchtime=Nx (N number, suffix x) means run N times, we test multiple number of workers
 # against 1 million requests.
 ```
 Possible result:

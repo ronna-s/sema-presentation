@@ -17,7 +17,7 @@ func process(maxHandlers int, reqs []Request) {
 		wg.Add(1)
 		go func(r Request) {
 			sem.Acquire(context.Background(), 1)
-			r.Handle()
+			Handle(r)
 			sem.Release(1)
 			wg.Done()
 		}(r)

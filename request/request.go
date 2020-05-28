@@ -18,7 +18,7 @@ func Fib(n int) int {
 	return Fib(n-1) + Fib(n-2)
 }
 
-func (r Request) Handle() {
+func Handle(r Request) {
 	atomic.AddInt64(&nProcessed, 1)
 	Fib(rand.Intn(10) + 2)
 }

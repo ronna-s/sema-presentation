@@ -16,7 +16,7 @@ func process(maxHandlers int, reqs []Request) {
 	for i := 0; i < maxHandlers; i++ {
 		go func() {
 			for r := range ch {
-				r.Handle()
+				Handle(r)
 			}
 			wg.Done()
 		}()

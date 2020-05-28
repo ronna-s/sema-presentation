@@ -14,7 +14,7 @@ func process(maxHandlers int, reqs []Request) {
 		wg.Add(1)
 		go func(r Request) {
 			sema <- struct{}{}
-			r.Handle()
+			Handle(r)
 			<-sema
 			wg.Done()
 		}(r)

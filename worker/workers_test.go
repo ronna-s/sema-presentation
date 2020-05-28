@@ -1,31 +1,22 @@
 package worker_test
 
 import (
-	"testing"
 	"sync"
-	"time"
-	"sync/atomic"
+	"testing"
+
+	. "github.com/ronna-s/sema-presentation/request"
 )
 
-type request struct{}
-
-var count int64
-
-func handle(r request) {
-	atomic.AddInt64(&count, 1)
-	time.Sleep(time.Microsecond * 100)
-}
-
-func process(maxHandlers int, reqs []request) {
+func process(maxHandlers int, reqs []Request) {
 	var wg sync.WaitGroup
 	wg.Add(maxHandlers)
 
-	ch := make(chan request, 10*maxHandlers) //a good number to toy with
+	ch := make(chan Request, 10*maxHandlers) //a good number to toy with
 
 	for i := 0; i < maxHandlers; i++ {
 		go func() {
 			for r := range ch {
-				handle(r)
+				r.Handle()
 			}
 			wg.Done()
 		}()
@@ -37,32 +28,26 @@ func process(maxHandlers int, reqs []request) {
 	wg.Wait()
 }
 
-func benchmarkServe(b *testing.B, n int) {
-	count = 0
-	reqs := make([]request, b.N)
-	process(n, reqs)
-	if int(count) != b.N {
-		b.Errorf("number of messages handled doesn't match, wanted: '%d' but received: '%d'", b.N, count)
-
-	}
-}
-
 func BenchmarkServe10(b *testing.B) {
-	benchmarkServe(b, 10)
+	Serve(b.N, 10, process)
 }
 
 func BenchmarkServe100(b *testing.B) {
-	benchmarkServe(b, 100)
+	Serve(b.N, 100, process)
 }
 
 func BenchmarkServe1000(b *testing.B) {
-	benchmarkServe(b, 1000)
+	Serve(b.N, 1000, process)
 }
 
 func BenchmarkServe10000(b *testing.B) {
-	benchmarkServe(b, 10000)
+	Serve(b.N, 10000, process)
 }
 
 func BenchmarkServe100000(b *testing.B) {
-	benchmarkServe(b, 100000)
+	Serve(b.N, 100000, process)
+}
+
+func BenchmarkServe1000000(b *testing.B) {
+	Serve(b.N, 1000000, process)
 }

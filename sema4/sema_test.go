@@ -1,32 +1,23 @@
 package sema4_test
 
 import (
-	"testing"
-	"sync"
-	"golang.org/x/sync/semaphore"
 	"context"
-	"time"
-	"sync/atomic"
+	"sync"
+	"testing"
+
+	. "github.com/ronna-s/sema-presentation/request"
+	"golang.org/x/sync/semaphore"
 )
 
-type request struct{}
-
-var count int64
-
-func handle(r request) {
-	atomic.AddInt64(&count, 1)
-	time.Sleep(time.Microsecond)
-}
-
-func process(maxHandlers int, reqs []request) {
+func process(maxHandlers int, reqs []Request) {
 	var wg sync.WaitGroup
 	sem := semaphore.NewWeighted(int64(maxHandlers))
 
 	for _, r := range reqs {
 		wg.Add(1)
 		sem.Acquire(context.Background(), 1)
-		go func(r request) {
-			handle(r)
+		go func(r Request) {
+			r.Handle()
 			sem.Release(1)
 			wg.Done()
 		}(r)
@@ -34,32 +25,27 @@ func process(maxHandlers int, reqs []request) {
 	wg.Wait()
 }
 
-func benchmarkServe(b *testing.B, n int) {
-	count = 0
-	reqs := make([]request, b.N)
-	process(n, reqs)
-	if int(count) != b.N {
-		b.Errorf("number of messages handled doesn't match, wanted: '%d' but received: '%d'", b.N, count)
-
-	}
-}
 
 func BenchmarkServe10(b *testing.B) {
-	benchmarkServe(b, 10)
+	Serve(b.N, 10, process)
 }
 
 func BenchmarkServe100(b *testing.B) {
-	benchmarkServe(b, 100)
+	Serve(b.N, 100, process)
 }
 
 func BenchmarkServe1000(b *testing.B) {
-	benchmarkServe(b, 1000)
+	Serve(b.N, 1000, process)
 }
 
 func BenchmarkServe10000(b *testing.B) {
-	benchmarkServe(b, 10000)
+	Serve(b.N, 10000, process)
 }
 
 func BenchmarkServe100000(b *testing.B) {
-	benchmarkServe(b, 100000)
+	Serve(b.N, 100000, process)
+}
+
+func BenchmarkServe1000000(b *testing.B) {
+	Serve(b.N, 1000000, process)
 }

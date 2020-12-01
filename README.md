@@ -3,7 +3,6 @@
 
 #### sema1:
 Take the Effective Go approach. Create a goroutine and aquire the semaphore inside the goroutine's execution.
-Issue: Can run out of goroutines (depending on the rate of the incoming requests vs. the speed of `handle`.
 ```go
 sema := make(chan struct{}, maxHandlers)
 go func(r Request) {
